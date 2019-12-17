@@ -1,7 +1,7 @@
 #include <SANDAL2/SANDAL2.h>
 
 #include "initplateau.h"
-#define TAILLE 5
+#define TAILLE 22
 void init_plateau(){
 	int red[]   = {255,0,0,255};
 	int green[]  = {0,255,0,255};
@@ -17,7 +17,7 @@ void init_plateau(){
 											{0,1,0,0,1}};*/
 
 	int tableau_plateau[TAILLE][TAILLE]={
-	#include "../plateau.c"
+	#include "../python/plateautest.c"
 	};
 
 
@@ -26,8 +26,8 @@ void init_plateau(){
 	int i,j,k,x,y;
 	for (i=0;i<TAILLE;i++){
 		for (j=0;j<TAILLE;j++){
-			x = 50 + j*800/5;
-			y = 100 + i*800/5;
+			x = 50 + j*800/TAILLE;
+			y = 100 + i*800/TAILLE;
 			switch (tableau_plateau[i][j]){
 				case 0:
 
@@ -47,8 +47,8 @@ void init_plateau(){
 
 			if(!createBlock(x, /* x coordinate */
 							y, /* y coordinate */
-							80, /* width */
-							80, /* height */
+							800/TAILLE+1, /* width */
+							800/TAILLE+1, /* height */
 							color, /* color */
 							0, /* display code */
 							0)) /* plan, the lower the nearer */
