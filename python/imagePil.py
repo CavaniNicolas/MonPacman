@@ -3,11 +3,11 @@
 from PIL import Image as pil
 
 def ima2fic():
-	variableImage = pil.open("plateauAscanner.png")
+	variableImage = pil.open("plateau.png")
 
 	pil.Image.show(variableImage)
 
-	taille = 22
+	taille = 20
 	t=[]
 	for i in range(taille):
 		s="{"
@@ -29,7 +29,7 @@ def ima2fic():
 
 
 def str2fic(t):
-	file = open("plateautest.c","w")
+	file = open("plateau.c","w")
 	for k in range(len(t)):
 		# print(t[k])
 		file.write(t[k])

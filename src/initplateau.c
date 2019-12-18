@@ -1,13 +1,11 @@
 #include <SANDAL2/SANDAL2.h>
 
 #include "initplateau.h"
-#define TAILLE 22
+
 void init_plateau(){
-	int red[]   = {255,0,0,255};
-	int green[]  = {0,255,0,255};
-	int blue[] = {0,0,255,255};
-	int white[] = {255,255,255,255};
-	int black[] = {0,0,0,255};
+	int darkblue[] = {0,3,69,255};
+	int pourpre[] = {100,0,0,255};
+	int violet[] = {171,98,255,255};
 
 	//int TAILLE = 5;
 	/*int tableau_plateau[TAILLE][TAILLE]={   {1,1,1,0,0},
@@ -17,9 +15,8 @@ void init_plateau(){
 											{0,1,0,0,1}};*/
 
 	int tableau_plateau[TAILLE][TAILLE]={
-	#include "../python/plateautest.c"
+	#include "../python/plateau.c"
 	};
-
 
 
 	int color[4];
@@ -32,14 +29,14 @@ void init_plateau(){
 				case 0:
 
 					for (k=0;k<4;k++){
-						color[k]=green[k];
+						color[k]=pourpre[k];
 					}
 
 					break;
 				case 1:
 
 					for (k=0;k<4;k++){
-						color[k]=red[k];
+						color[k]=violet[k];
 					}
 
 					break;
@@ -51,7 +48,7 @@ void init_plateau(){
 							800/TAILLE+1, /* height */
 							color, /* color */
 							0, /* display code */
-							0)) /* plan, the lower the nearer */
+							1)) /* plan, the lower the nearer */
 			puts("Failed to create the block");
 		}
 	}
@@ -60,8 +57,8 @@ void init_plateau(){
 					100, /* y coordinate */
 					800, /* width */
 					800, /* height */
-					blue, /* color */
+					darkblue, /* color */
 					0, /* display code */
-					1)) /* plan, the lower the nearer */
+					2)) /* plan, the lower the nearer */
 	puts("Failed to create the block");
 }
