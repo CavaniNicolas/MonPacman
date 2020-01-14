@@ -8,6 +8,10 @@ void action(Element * this);
 void click(Element * this,int);
 Element * createPacman(int spawnX, int spawnY);
 
+int tableau_plateau_hitbox[TAILLEHITBOX][TAILLEHITBOX]={
+#include "../python/plateauHitbox.c"
+};
+int coteCube = 880/TAILLEHITBOX;
 
 typedef enum{
 	up,
@@ -17,15 +21,18 @@ typedef enum{
 }dir;
 dir direction=left;
 
+
+
 int main(){
 	Element * e;
-	int spawnX = 50+11*800/TAILLE;
-	int spawnY = 100+13*800/TAILLE;
+	int spawnX = 10+12*coteCube;
+	int spawnY = 60+14*coteCube;
 	int darkblue[] = {0,3,69,255};
 
 
 	initAllSANDAL2(IMG_INIT_JPG);
 	createWindow(900,950,"Pacman",0,darkblue,0);
+
 
 	init_plateau();
 
@@ -69,7 +76,7 @@ int main(){
 	displayWindow();
 
 	/* this delay is to have about 60fps */
-	SDL_Delay(8);
+	SDL_Delay(14);
 	}
 
 	closeAllWindow();
@@ -81,8 +88,8 @@ Element * createPacman(int spawnX, int spawnY){
 	Element * e;
 	e=createImage(spawnX, /* x coordinate */
 					spawnY, /* y coordinate */
-					40, /* width */
-					40, /* height */
+					coteCube, /* width */
+					coteCube, /* height */
 					"bin/pacmanLeft.png", /* image to be loaded */
 					0, /* display code */
 					0); /* plan, the lower the nearer */
@@ -107,22 +114,63 @@ void key_behavior(Element * this, SDL_Keycode c){
 	getDimensionWindow(&w_w, /* where to store width, can be NULL */
 						&w_h); /* where to store height, can be NULL */
 
+	angles coord_angles; //coord des angles internes du pacman
+
+	coord_angles.hg.x = (x+1-10);
+	coord_angles.hg.y = (y+1-60);
+
+	coord_angles.bg.x = (x+1-10);
+	coord_angles.bg.y = (y+coteCube-1-60);
+
+
+	coord_angles.hd.x = (x+coteCube-1-10);
+	coord_angles.hd.y = (y+1-60);
+
+	coord_angles.bd.x = (x+coteCube-1-10);
+	coord_angles.bd.y = (y+coteCube-1-60);
+
+
+	int hitbox_X_hautgauche_left = (coord_angles.hg.x-2)/coteCube;
+	int hitbox_Y_hautgauche_left = (coord_angles.hg.y)/coteCube;
+	int hitbox_X_basgauche_left = (coord_angles.bg.x-2)/coteCube;
+	int hitbox_Y_basgauche_left = (coord_angles.bg.y)/coteCube;
+
+	int hitbox_X_hautdroite_right = (coord_angles.hd.x+2)/coteCube;
+	int hitbox_Y_hautdroite_right = (coord_angles.hd.y)/coteCube;
+	int hitbox_X_basdroite_right = (coord_angles.bd.x+2)/coteCube;
+	int hitbox_Y_basdroite_right = (coord_angles.bd.y)/coteCube;
+
+	int hitbox_X_basgauche_down = (coord_angles.bg.x)/coteCube;
+	int hitbox_Y_basgauche_down = (coord_angles.bg.y+2)/coteCube;
+	int hitbox_X_basdroite_down = (coord_angles.bd.x)/coteCube;
+	int hitbox_Y_basdroite_down = (coord_angles.bd.y+2)/coteCube;
+
+	int hitbox_X_hautgauche_up = (coord_angles.hg.x)/coteCube;
+	int hitbox_Y_hautgauche_up = (coord_angles.hg.y-2)/coteCube;
+	int hitbox_X_hautdroite_up = (coord_angles.hd.x)/coteCube;
+	int hitbox_Y_hautdroite_up = (coord_angles.hd.y-2)/coteCube;
+
+
 	switch (c){
 		case SDLK_UP:
-			//moveElement(this,0,-1);
-			direction=up;
+			if ((tableau_plateau_hitbox[hitbox_Y_hautgauche_up][hitbox_X_hautgauche_up]==0) && (tableau_plateau_hitbox[hitbox_Y_hautdroite_up][hitbox_X_hautdroite_up]==0)){
+				direction=up;
+			}
 			break;
 		case SDLK_DOWN:
-			//moveElement(this,0,1);
-			direction=down;
+			if ((tableau_plateau_hitbox[hitbox_Y_basgauche_down][hitbox_X_basgauche_down]==0) && (tableau_plateau_hitbox[hitbox_Y_basdroite_down][hitbox_X_basdroite_down]==0)){
+				direction=down;
+			}
 			break;
 		case SDLK_LEFT:
-			//moveElement(this,-1,0);
-			direction=left;
+			if ((tableau_plateau_hitbox[hitbox_Y_hautgauche_left][hitbox_X_hautgauche_left]==0) && (tableau_plateau_hitbox[hitbox_Y_basgauche_left][hitbox_X_basgauche_left]==0)){
+				direction=left;
+			}
 			break;
 		case SDLK_RIGHT:
-			//moveElement(this,1,0);
-			direction=right;
+			if ((tableau_plateau_hitbox[hitbox_Y_hautdroite_right][hitbox_X_hautdroite_right]==0) && (tableau_plateau_hitbox[hitbox_Y_basdroite_right][hitbox_X_basdroite_right]==0)){
+				direction=right;
+			}
 			break;
 
 	}
@@ -132,10 +180,6 @@ void action(Element * this){
 	double x, y;
 	double w, h;
 	int w_w, w_h;
-
-	int tableau_plateau_hitbox[TAILLEHITBOX][TAILLEHITBOX]={
-	#include "../python/plateauHitbox.c"
-	};
 
 
 	getCoordElement(this, /* element */
@@ -150,64 +194,102 @@ void action(Element * this){
 						&w_h); /* where to store height, can be NULL */
 
 
-	int posXtab = ((int)x-10)/(880/TAILLEHITBOX);
-	int posYtab = ((int)y-60)/(880/TAILLEHITBOX);
+	// int ix=(int)x;
+	// int iy=(int)y;
+	//printf("x=%d y=%d\n",ix-10,iy-60 );
 
-	int ix=(int)x;
-	int iy=(int)y;
-	printf("x=%d y=%d\n",ix,iy );
+	angles coord_angles; //coord des angles internes du pacman
+
+	coord_angles.hg.x = (x+1-10);
+	coord_angles.hg.y = (y+1-60);
+	//printf("hg.x=%d hg.y=%d\n",coord_angles.hg.x,coord_angles.hg.y);
+
+	coord_angles.bg.x = (x+1-10);
+	coord_angles.bg.y = (y+coteCube-1-60);
+	//printf("bg.x=%d bg.y=%d\n",coord_angles.bg.x,coord_angles.bg.y);
+
+
+	coord_angles.hd.x = (x+coteCube-1-10);
+	coord_angles.hd.y = (y+1-60); ///////
+	//printf("hd.x=%d hd.y=%d\n",coord_angles.hd.x,coord_angles.hd.y);
+
+	coord_angles.bd.x = (x+coteCube-1-10);
+	coord_angles.bd.y = (y+coteCube-1-60);
+	//printf("bd.x=%d bd.y=%d\n",coord_angles.bd.x,coord_angles.bd.y);
+
+
+	int hitbox_X_hautgauche_left = (coord_angles.hg.x-2)/coteCube;
+	int hitbox_Y_hautgauche_left = (coord_angles.hg.y)/coteCube;
+	int hitbox_X_basgauche_left = (coord_angles.bg.x-2)/coteCube;
+	int hitbox_Y_basgauche_left = (coord_angles.bg.y)/coteCube;
+
+	int hitbox_X_hautdroite_right = (coord_angles.hd.x+2)/coteCube;
+	int hitbox_Y_hautdroite_right = (coord_angles.hd.y)/coteCube;
+	int hitbox_X_basdroite_right = (coord_angles.bd.x+2)/coteCube;
+	int hitbox_Y_basdroite_right = (coord_angles.bd.y)/coteCube;
+
+	int hitbox_X_basgauche_down = (coord_angles.bg.x)/coteCube;
+	int hitbox_Y_basgauche_down = (coord_angles.bg.y+2)/coteCube;
+	int hitbox_X_basdroite_down = (coord_angles.bd.x)/coteCube;
+	int hitbox_Y_basdroite_down = (coord_angles.bd.y+2)/coteCube;
+
+	int hitbox_X_hautgauche_up = (coord_angles.hg.x)/coteCube;
+	int hitbox_Y_hautgauche_up = (coord_angles.hg.y-2)/coteCube;
+	int hitbox_X_hautdroite_up = (coord_angles.hd.x)/coteCube;
+	int hitbox_Y_hautdroite_up = (coord_angles.hd.y-2)/coteCube;
+
+
+	int deplacement=1;
 
 	switch (direction){
 		case up:
 			setImageElement(this,"bin/pacmanUp.png");
-			printf("Xtab=%d, Ytab=%d\n",posXtab,posYtab);
-			printf("%d\n",tableau_plateau_hitbox[posYtab-1][posXtab]);
-			if (tableau_plateau_hitbox[posYtab-1][posXtab]==0){
+			if ((tableau_plateau_hitbox[hitbox_Y_hautgauche_up][hitbox_X_hautgauche_up]==0) && (tableau_plateau_hitbox[hitbox_Y_hautdroite_up][hitbox_X_hautdroite_up]==0)){
+
+
 				moveElement(this, /* element to be moved */
 							0, /* x offset to be added */
-							-1); /* y offset to be added */
+							-deplacement); /* y offset to be added */
 			}
 			break;
 
 
 		case down:
 			setImageElement(this,"bin/pacmanDown.png");
-			printf("Xtab=%d, Ytab=%d\n",posXtab,posYtab);
-			printf("%d\n",tableau_plateau_hitbox[posYtab+1][posXtab]);
-			if (tableau_plateau_hitbox[posYtab+1][posXtab]==0){
-				moveElement(this,0,1);
+			if ((tableau_plateau_hitbox[hitbox_Y_basgauche_down][hitbox_X_basgauche_down]==0) && (tableau_plateau_hitbox[hitbox_Y_basdroite_down][hitbox_X_basdroite_down]==0)){
+				moveElement(this,0,deplacement);
 			}
 			break;
 
 
 		case left:
 			setImageElement(this,"bin/pacmanLeft.png");
-			printf("Xtab=%d, Ytab=%d\n",posXtab,posYtab);
-			printf("%d\n",tableau_plateau_hitbox[posYtab][posXtab-1]);
-			if (tableau_plateau_hitbox[posYtab][posXtab-1]==0){
-				moveElement(this,-1,0);
+			if ((tableau_plateau_hitbox[hitbox_Y_hautgauche_left][hitbox_X_hautgauche_left]==0) && (tableau_plateau_hitbox[hitbox_Y_basgauche_left][hitbox_X_basgauche_left]==0)){
+				
+					
+				moveElement(this,-deplacement,0);
 			}
 			break;
 
 
 		case right:
 			setImageElement(this,"bin/pacmanRight.png");
-			printf("Xtab=%d, Ytab=%d\n",posXtab,posYtab);
-			printf("%d\n",tableau_plateau_hitbox[posYtab][posXtab+1]);
-			if (tableau_plateau_hitbox[posYtab][posXtab+1]==0){
-				moveElement(this,1,0);
+			if ((tableau_plateau_hitbox[hitbox_Y_hautdroite_right][hitbox_X_hautdroite_right]==0) && (tableau_plateau_hitbox[hitbox_Y_basdroite_right][hitbox_X_basdroite_right]==0)){
+				
+					
+				moveElement(this,deplacement,0);
 			}
 			break;
 	}
 
 
-	if(tableau_plateau_hitbox[posXtab][posYtab]==2){
-		if (posXtab==0){
-			replaceElement(this,810,y);
-		}else{
-			replaceElement(this,50,y);
-		}
-	}
+	// if(tableau_plateau_hitbox[posXtab_hautgauche][posYtab_hautgauche]==2){
+	// 	if (posXtab_hautgauche==0){
+	// 		replaceElement(this,810,y);
+	// 	}else{
+	// 		replaceElement(this,50,y);
+	// 	}
+	// }
 
 }
 

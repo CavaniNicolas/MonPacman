@@ -3,7 +3,6 @@
 #include "initplateau.h"
 
 void init_plateau(){
-	int darkblue[] = {0,3,69,255};
 	int pourpre[] = {100,0,0,255};
 	int violet[] = {171,98,255,255};
 
@@ -14,18 +13,14 @@ void init_plateau(){
 											{0,1,1,0,1},
 											{0,1,0,0,1}};*/
 
-	int tableau_plateau[TAILLE][TAILLE]={
-	#include "../python/plateau.c"
-	};
-
 
 	int color[4];
 	int i,j,k,x,y;
-	for (i=0;i<TAILLE;i++){
-		for (j=0;j<TAILLE;j++){
-			x = 50 + j*800/TAILLE;
-			y = 100 + i*800/TAILLE;
-			switch (tableau_plateau[i][j]){
+	for (i=0;i<TAILLEHITBOX;i++){
+		for (j=0;j<TAILLEHITBOX;j++){
+			x = 10 + j*coteCube;
+			y = 60 + i*coteCube;
+			switch (tableau_plateau_hitbox[i][j]){
 				case 0:
 
 					for (k=0;k<4;k++){
@@ -44,8 +39,8 @@ void init_plateau(){
 
 			if(!createBlock(x, /* x coordinate */
 							y, /* y coordinate */
-							800/TAILLE+1, /* width */
-							800/TAILLE+1, /* height */
+							coteCube, /* width */
+							coteCube, /* height */
 							color, /* color */
 							0, /* display code */
 							1)) /* plan, the lower the nearer */
@@ -53,12 +48,12 @@ void init_plateau(){
 		}
 	}
 
-	if(!createBlock(50, /* x coordinate */
-					100, /* y coordinate */
-					800, /* width */
-					800, /* height */
-					darkblue, /* color */
-					0, /* display code */
-					2)) /* plan, the lower the nearer */
-	puts("Failed to create the block");
+	// if(!createBlock(50, /* x coordinate */
+	// 				100, /* y coordinate */
+	// 				800, /* width */
+	// 				800, /* height */
+	// 				darkblue, /* color */
+	// 				0, /* display code */
+	// 				2)) /* plan, the lower the nearer */
+	// puts("Failed to create the block");
 }

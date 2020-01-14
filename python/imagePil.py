@@ -3,21 +3,33 @@
 from PIL import Image as pil
 
 def ima2fic():
-	variableImage = pil.open("plateau.png")
+	variableImage = pil.open("plateauHitbox.png")
 
 	pil.Image.show(variableImage)
 
-	taille = 20
+	tailleHitbox = 22
+	coteCube = 880/tailleHitbox
+	mur = 1
+	chemin = 0
+	portail = 2
+
 	t=[]
-	for i in range(taille):
+	for i in range(tailleHitbox):
 		s="{"
-		y=i*40
-		for j in range(taille):
-			x=j*40
+		y=i*coteCube
+		for j in range(tailleHitbox):
+			x=j*coteCube
 			r,g,b=variableImage.getpixel((x,y))
 			# print("r={}, g={}, b={}".format(r,g,b))
-			s+=str(int(r==163))+","
-		if i==taille-1:
+			#s+=str(int(r==163))+","
+			if r==163:
+				s+=str(mur)
+			elif r==255:
+				s+=str(chemin)
+			elif r==216:
+				s+=str(portail)
+			s+=","
+		if i==tailleHitbox-1:
 			s=s[:-1]+"}"
 		else:
 			s=s[:-1]+"},\n"
@@ -29,7 +41,7 @@ def ima2fic():
 
 
 def str2fic(t):
-	file = open("plateau.c","w")
+	file = open("plateauHitbox.c","w")
 	for k in range(len(t)):
 		# print(t[k])
 		file.write(t[k])
